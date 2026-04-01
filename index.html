@@ -75,29 +75,25 @@
         let targetUrl = '';
 
         if (isUrl(input)) {
-            // Prepend https:// if the user forgot it
             if (!input.startsWith('http://') && !input.startsWith('https://')) {
                 targetUrl = 'https://' + input;
             } else {
                 targetUrl = input;
             }
         } else {
-            // Treat the input as a Google search query
-            targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+            // Added the &igu=1 parameter here so Google allows iframing!
+            targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input) + '&igu=1';
         }
 
-        // Open a new about:blank tab
         let newTab = window.open('about:blank', '_blank');
 
         if (newTab) {
-            // Apply styles to the new blank tab's body
             newTab.document.body.style.margin = '0';
             newTab.document.body.style.padding = '0';
             newTab.document.body.style.height = '100vh';
             newTab.document.body.style.overflow = 'hidden';
             newTab.document.body.style.backgroundColor = '#fff';
 
-            // Create and inject the iframe
             const iframe = newTab.document.createElement('iframe');
             iframe.src = targetUrl;
             iframe.style.border = 'none';
@@ -105,15 +101,12 @@
             iframe.style.height = '100vh';
 
             newTab.document.body.appendChild(iframe);
-            
-            // Optional: You can force the title of the blank tab so it doesn't say "about:blank" on the tab itself
             newTab.document.title = "Search"; 
         } else {
             alert('Pop-up blocked! Please allow pop-ups for this site to open new tabs.');
         }
     }
 
-    // Allow hitting "Enter" to trigger the button
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             launch();
