@@ -92,26 +92,23 @@
         let newTab = window.open('about:blank', '_blank');
 
         if (newTab) {
-            /* * Method 1: Location Replace
-             * This opens about:blank, then redirects it. It clears the referrer data 
-             * but the URL bar WILL update to the target website. This is required for Google 
-             * Search because Google blocks itself from being embedded in iframes.
-             */
-            newTab.location.replace(targetUrl);
-
-            /* * Method 2: iframe Cloaking (Keeps the URL bar as "about:blank")
-             * If you want the URL bar to STAY as "about:blank" permanently, you can use the 
-             * iframe code below instead. 
-             * NOTE: Google Search and many other major sites block iframes, so searches will show 
-             * a "refused to connect" error if you use this method for everything.
-             */
-             
-            // newTab.document.write(`
-            //     <style>body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; } iframe { border: none; width: 100vw; height: 100vh; }</style>
-            //     <iframe src="${targetUrl}"></iframe>
-            // `);
-            // newTab.document.close();
-            
+            // iframe Cloaking: Keeps the URL bar permanently as "about:blank"
+            newTab.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>about:blank</title>
+                    <style>
+                        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #fff; } 
+                        iframe { border: none; width: 100vw; height: 100vh; }
+                    </style>
+                </head>
+                <body>
+                    <iframe src="${targetUrl}"></iframe>
+                </body>
+                </html>
+            `);
+            newTab.document.close();
         } else {
             alert('Pop-up blocked! Please allow pop-ups for this site to open new tabs.');
         }
