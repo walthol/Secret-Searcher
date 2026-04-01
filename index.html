@@ -64,15 +64,13 @@
 <script>
     // Helper function to guess if the input is a URL
     function isUrl(text) {
-        // If it has spaces, it's definitely a search term
         if (text.includes(' ')) return false;
-        // If it starts with http/https or contains a dot (like example.com), treat as URL
         return text.includes('.') || text.startsWith('http://') || text.startsWith('https://');
     }
 
     function launch() {
         let input = document.getElementById('userInput').value.trim();
-        if (!input) return; // Do nothing if the input is empty
+        if (!input) return;
 
         let targetUrl = '';
 
@@ -92,23 +90,24 @@
         let newTab = window.open('about:blank', '_blank');
 
         if (newTab) {
-            // iframe Cloaking: Keeps the URL bar permanently as "about:blank"
-            newTab.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>about:blank</title>
-                    <style>
-                        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #fff; } 
-                        iframe { border: none; width: 100vw; height: 100vh; }
-                    </style>
-                </head>
-                <body>
-                    <iframe src="${targetUrl}"></iframe>
-                </body>
-                </html>
-            `);
-            newTab.document.close();
+            // Apply styles to the new blank tab's body
+            newTab.document.body.style.margin = '0';
+            newTab.document.body.style.padding = '0';
+            newTab.document.body.style.height = '100vh';
+            newTab.document.body.style.overflow = 'hidden';
+            newTab.document.body.style.backgroundColor = '#fff';
+
+            // Create and inject the iframe
+            const iframe = newTab.document.createElement('iframe');
+            iframe.src = targetUrl;
+            iframe.style.border = 'none';
+            iframe.style.width = '100vw';
+            iframe.style.height = '100vh';
+
+            newTab.document.body.appendChild(iframe);
+            
+            // Optional: You can force the title of the blank tab so it doesn't say "about:blank" on the tab itself
+            newTab.document.title = "Search"; 
         } else {
             alert('Pop-up blocked! Please allow pop-ups for this site to open new tabs.');
         }
