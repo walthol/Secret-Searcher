@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>about:blank opener</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #202124;
+            margin: 0;
+            color: #fff;
+        }
+        .container {
+            background: #303134;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 350px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #5f6368;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: #202124;
+            color: white;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: #8ab4f8;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #8ab4f8;
+            color: #202124;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #aecbfa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>about:blank Launcher</h2>
+    <input type="text" id="userInput" placeholder="Enter a URL or search term..." onkeypress="handleKeyPress(event)">
+    <br>
+    <button onclick="launch()">Open in new tab</button>
+</div>
+
+<script>
+    // Helper function to guess if the input is a URL
+    function isUrl(text) {
+        // If it has spaces, it's definitely a search term
+        if (text.includes(' ')) return false;
+        // If it starts with http/https or contains a dot (like example.com), treat as URL
+        return text.includes('.') || text.startsWith('http://') || text.startsWith('https://');
+    }
+
+    function launch() {
+        let input = document.getElementById('userInput').value.trim();
+        if (!input) return; // Do nothing if the input is empty
+
+        let targetUrl = '';
+
+        if (isUrl(input)) {
+            // Prepend https:// if the user forgot it
+            if (!input.startsWith('http://') && !input.startsWith('https://')) {
+                targetUrl = 'https://' + input;
+            } else {
+                targetUrl = input;
+            }
+        } else {
+            // Treat the input as a Google search query
+            targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+        }
+
+        // Open a new about:blank tab
+        let newTab = window.open('about:blank', '_blank');
+
+        if (newTab) {
+            /* * Method 1: Location Replace
+             * This opens about:blank, then redirects it. It clears the referrer data 
+             * but the URL bar WILL update to the target website. This is required for Google 
+             * Search because Google blocks itself from being embedded in iframes.
+             */
+            newTab.location.replace(targetUrl);
+
+            /* * Method 2: iframe Cloaking (Keeps the URL bar as "about:blank")
+             * If you want the URL bar to STAY as "about:blank" permanently, you can use the 
+             * iframe code below instead. 
+             * NOTE: Google Search and many other major sites block iframes, so searches will show 
+             * a "refused to connect" error if you use this method for everything.
+             */
+             
+            // newTab.document.write(`
+            //     <style>body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; } iframe { border: none; width: 100vw; height: 100vh; }</style>
+            //     <iframe src="${targetUrl}"></iframe>
+            // `);
+            // newTab.document.close();
+            
+        } else {
+            alert('Pop-up blocked! Please allow pop-ups for this site to open new tabs.');
+        }
+    }
+
+    // Allow hitting "Enter" to trigger the button
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            launch();
+        }
+    }
+</script>
+
+</body>
+</html>
